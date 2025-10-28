@@ -24,6 +24,7 @@ import java.util.Arrays;
 /**
  * Configuración de Spring Security para la aplicación.
  * Define el PasswordEncoder, el AuthenticationManager y las reglas de acceso.
+ * Configura Spring Security: CORS/CSRF off, sesiones stateless, reglas por rol y rutas públicas.
  */
 @Configuration
 @EnableWebSecurity

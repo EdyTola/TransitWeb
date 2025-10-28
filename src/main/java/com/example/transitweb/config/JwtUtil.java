@@ -12,6 +12,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
+/*
+Genera tokens JWT y extrae/valida claims (usuario, expiración) usando app.jwt.secret.
+ */
 @Component
 public class JwtUtil {
 

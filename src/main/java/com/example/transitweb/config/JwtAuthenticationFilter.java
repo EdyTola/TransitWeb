@@ -13,6 +13,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+//Permite que los endpoints conozcan al usuario/rol sin reconsultar credenciales.
+
 import java.io.IOException;
 
 @Component

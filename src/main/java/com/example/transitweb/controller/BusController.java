@@ -28,7 +28,8 @@ public class BusController {
         Bus b = busRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Bus no encontrado"));
         b.setPlaca(body.getPlaca());
         b.setEstado(body.getEstado());
-        b.setRuta(body.getRuta());
+        b.setRutaActual(body.getRutaActual());
+        b.setTieneRampa(body.getTieneRampa());
         return ResponseEntity.ok(busRepository.save(b));
     }
 
