@@ -12,10 +12,8 @@ import java.util.Optional;
 @Repository
 public interface RutaParaderoRepository extends JpaRepository<RutaParadero, Long> {
     // Obtener la secuencia ordenada de paraderos para una ruta
-    List<RutaParadero> findByRutaOrderBySecuenciaAsc(Ruta ruta);
-
     List<RutaParadero> findByRutaOrderByOrdenAsc(Ruta ruta);
 
-    Optional<Object> findByRutaAndParadero(Ruta ruta, Paradero paradero);
+    Optional<RutaParadero> findByRutaAndParadero(Ruta ruta, Paradero paradero);
 
 }
