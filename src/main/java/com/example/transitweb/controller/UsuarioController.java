@@ -3,6 +3,7 @@ package com.example.transitweb.controller;
 import com.example.transitweb.dto.AuthDTO.LoginRequestDTO;
 import com.example.transitweb.dto.AuthDTO.LoginResponseDTO;
 import com.example.transitweb.entity.Usuario;
+import com.example.transitweb.config.JwtUtil;
 import com.example.transitweb.entity.Rol;
 import com.example.transitweb.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class UsuarioController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     // --- Endpoints de Autenticación (Login) ---
 
     @PostMapping("/login")
@@ -45,11 +49,16 @@ public class UsuarioController {
             // Por ahora, solo devolvemos un DTO de éxito con el ID y Rol del usuario.
             Usuario usuario = (Usuario) authentication.getPrincipal();
 
+            String token = jwtUtil.generateToken(usuario.getCorreo(), java.util.Map.of(
+                    "userId", usuario.getId(),
+                    "rol", usuario.getRol().name()
+            ));
+
             LoginResponseDTO response = new LoginResponseDTO(
                     usuario.getId(),
                     usuario.getCorreo(),
                     usuario.getRol().name(),
-                    "TOKEN_JWT_GENERADO_EXITOSAMENTE" // Placeholder para el token real
+                    token
             );
 
             return ResponseEntity.ok(response);
@@ -67,6 +76,18 @@ public class UsuarioController {
         // La validación de que solo el ADMIN pueda crear Conductores se haría en SecurityConfig
         Usuario nuevoConductor = usuarioService.createConductor(usuario);
         return new ResponseEntity<>(nuevoConductor, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/registrar/pasajero")
+    public ResponseEntity<Usuario> registerPasajero(@RequestBody Usuario usuario) {
+        Usuario nuevo = usuarioService.createPasajero(usuario);
+        return new ResponseEntity<>(nuevo, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/registrar/admin")
+    public ResponseEntity<Usuario> registerAdmin(@RequestBody Usuario usuario) {
+        Usuario nuevo = usuarioService.createAdmin(usuario);
+        return new ResponseEntity<>(nuevo, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

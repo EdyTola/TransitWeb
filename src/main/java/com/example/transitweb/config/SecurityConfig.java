@@ -1,6 +1,7 @@
 package com.example.transitweb.config;
 
 import com.example.transitweb.service.UsuarioService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -61,10 +63,19 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Desactivar CSRF para APIs REST
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Habilitar CORS
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Acceso público para el login y recarga (simulando pasarela de pago)
                         .requestMatchers("/api/usuarios/login").permitAll()
+                        .requestMatchers("/api/usuarios/registrar/**").permitAll()
                         .requestMatchers("/api/transacciones/recarga").permitAll() // Se puede restringir más tarde
+                        .requestMatchers("/api/panico/activar").hasAnyAuthority("CONDUCTOR")
+                        .requestMatchers("/api/transacciones/pago-pasaje").hasAnyAuthority("CONDUCTOR", "PASAJERO")
+                        .requestMatchers("/api/telemetria/**").hasAnyAuthority("CONDUCTOR")
+                        // WebSocket handshake endpoint
+                        .requestMatchers("/ws").permitAll()
+                        // Admin-only
+                        .requestMatchers("/api/buses/**", "/api/rutas/**", "/api/geocercas/**", "/api/mantenimiento/**", "/api/reportes/abiertos", "/api/reportes/*/estado").hasAuthority("ADMIN")
 
                         // Endpoints para Pasajero y Conductor
                         .requestMatchers("/api/reportes").hasAnyAuthority("PASAJERO", "CONDUCTOR")
@@ -78,6 +89,9 @@ public class SecurityConfig {
                         // Cualquier otra solicitud requiere autenticación (autenticado, no importa el rol)
                         .anyRequest().authenticated()
                 );
+
+        // Registrar filtro JWT antes del UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -95,5 +109,10 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
     }
 }

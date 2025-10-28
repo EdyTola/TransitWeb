@@ -73,6 +73,24 @@ public class UsuarioService implements UserDetailsService {
     }
 
     @Transactional
+    public Usuario createPasajero(Usuario usuario) {
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        usuario.setRol(Rol.PASAJERO);
+        if (usuario.getSaldoMonedero() == null) {
+            usuario.setSaldoMonedero(0.0);
+        }
+        return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public Usuario createAdmin(Usuario usuario) {
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        usuario.setRol(Rol.ADMIN);
+        usuario.setSaldoMonedero(0.0);
+        return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
     public Usuario updateUsuario(Long id, Usuario detallesUsuario) {
         Usuario usuario = getUsuarioById(id);
 
