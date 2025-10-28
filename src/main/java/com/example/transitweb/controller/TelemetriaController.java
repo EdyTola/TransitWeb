@@ -60,7 +60,7 @@ public class TelemetriaController {
     public ResponseEntity<Telemetria> actualizarOcupacion(@PathVariable Long busId,
                                                           @RequestParam int delta) {
         Bus bus = busRepository.findById(busId).orElseThrow(() -> new NoSuchElementException("Bus no encontrado"));
-        Telemetria last = telemetriaRepository.findTopByBusOrderByFechaHoraRegistroDesc(bus).orElse(null);
+        Telemetria last = telemetriaRepository.findTopByBusOrderByTimestampRegistroDesc(bus).orElse(null);
         Telemetria nueva = new Telemetria();
         nueva.setBus(bus);
         if (last != null) {
@@ -93,7 +93,7 @@ public class TelemetriaController {
     @GetMapping("/bus/{busId}/ultima")
     public ResponseEntity<Telemetria> ultima(@PathVariable Long busId) {
         Bus bus = busRepository.findById(busId).orElseThrow(() -> new NoSuchElementException("Bus no encontrado"));
-        return telemetriaRepository.findTopByBusOrderByFechaHoraRegistroDesc(bus)
+        return telemetriaRepository.findTopByBusOrderByTimestampRegistroDesc(bus)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

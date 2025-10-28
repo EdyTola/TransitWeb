@@ -38,7 +38,7 @@ public class GeocercaService {
     @Transactional
     public AlertaGeocerca evaluarYCrearAlerta(Bus bus, Geocerca geocerca) {
         // Simplificado: consulta la última telemetría conocida
-        Telemetria t = telemetriaRepository.findTopByBusOrderByFechaHoraRegistroDesc(bus)
+        Telemetria t = telemetriaRepository.findTopByBusOrderByTimestampRegistroDesc(bus)
                 .orElse(null);
         if (t == null) return null;
 

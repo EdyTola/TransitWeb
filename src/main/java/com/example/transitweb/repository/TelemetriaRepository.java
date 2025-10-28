@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface TelemetriaRepository extends JpaRepository<Telemetria, Long> {
-    // Obtener la última posición conocida de un bus
-    Optional<Telemetria> findTopByBusOrderByFechaHoraRegistroDesc(Bus bus);
+    // Obtener la última posición conocida de un bus (campo: timestampRegistro)
+    Optional<Telemetria> findTopByBusOrderByTimestampRegistroDesc(Bus bus);
 }

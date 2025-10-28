@@ -77,14 +77,7 @@ public class SecurityConfig {
                         // Admin-only
                         .requestMatchers("/api/buses/**", "/api/rutas/**", "/api/geocercas/**", "/api/mantenimiento/**", "/api/reportes/abiertos", "/api/reportes/*/estado").hasAuthority("ADMIN")
 
-                        // Endpoints para Pasajero y Conductor
-                        .requestMatchers("/api/reportes").hasAnyAuthority("PASAJERO", "CONDUCTOR")
-                        .requestMatchers("/api/transacciones/pago-pasaje").hasAnyAuthority("CONDUCTOR") // Lo usaría el dispositivo del bus
-
-                        // Endpoints para Administrador
-                        .requestMatchers("/api/usuarios/registrar/conductor").hasAuthority("ADMIN")
-                        .requestMatchers("/api/usuarios/rol/conductor").hasAuthority("ADMIN")
-                        .requestMatchers("/api/reportes/abiertos", "/api/reportes/{id}/estado").hasAuthority("ADMIN")
+                        // (reglas específicas arriba; se eliminaron duplicadas/antiguas)
 
                         // Cualquier otra solicitud requiere autenticación (autenticado, no importa el rol)
                         .anyRequest().authenticated()
