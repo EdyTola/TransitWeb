@@ -2,7 +2,9 @@ package com.example.transitweb.controller;
 
 import com.example.transitweb.entity.Paradero;
 import com.example.transitweb.entity.Ruta;
+import com.example.transitweb.entity.RutaParadero;
 import com.example.transitweb.repository.ParaderoRepository;
+import com.example.transitweb.repository.RutaParaderoRepository;
 import com.example.transitweb.repository.RutaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ public class RutaController {
     @Autowired
     private ParaderoRepository paraderoRepository;
 
+    @Autowired
+    private RutaParaderoRepository rutaParaderoRepository;
+
     @GetMapping
     public ResponseEntity<List<Ruta>> listar() { return ResponseEntity.ok(rutaRepository.findAll()); }
 
@@ -32,7 +37,8 @@ public class RutaController {
     public ResponseEntity<Ruta> actualizar(@PathVariable Long id, @RequestBody Ruta body) {
         Ruta r = rutaRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Ruta no encontrada"));
         r.setNombre(body.getNombre());
-        r.setDescripcion(body.getDescripcion());
+        r.setColorHex(body.getColorHex());
+        r.setCodigo(body.getCodigo());
         return ResponseEntity.ok(rutaRepository.save(r));
     }
 
@@ -46,14 +52,25 @@ public class RutaController {
     @GetMapping("/{rutaId}/paraderos")
     public ResponseEntity<List<Paradero>> paraderos(@PathVariable Long rutaId) {
         Ruta r = rutaRepository.findById(rutaId).orElseThrow(() -> new NoSuchElementException("Ruta no encontrada"));
-        return ResponseEntity.ok(paraderoRepository.findAll().stream().filter(p -> p.getRuta().getId().equals(r.getId())).toList());
+        List<RutaParadero> rutaParaderos = rutaParaderoRepository.findByRutaOrderByOrdenAsc(r);
+        return ResponseEntity.ok(rutaParaderos.stream().map(RutaParadero::getParadero).toList());
     }
 
     @PostMapping("/{rutaId}/paraderos")
-    public ResponseEntity<Paradero> crearParadero(@PathVariable Long rutaId, @RequestBody Paradero p) {
+    public ResponseEntity<RutaParadero> crearParadero(@PathVariable Long rutaId, @RequestBody Paradero p) {
         Ruta r = rutaRepository.findById(rutaId).orElseThrow(() -> new NoSuchElementException("Ruta no encontrada"));
-        p.setRuta(r);
-        return new ResponseEntity<>(paraderoRepository.save(p), HttpStatus.CREATED);
+        Paradero paraderoGuardado = paraderoRepository.save(p);
+        
+        // Obtener el máximo orden para la ruta
+        List<RutaParadero> paraderosExistentes = rutaParaderoRepository.findByRutaOrderByOrdenAsc(r);
+        int siguienteOrden = paraderosExistentes.isEmpty() ? 1 : paraderosExistentes.size() + 1;
+        
+        RutaParadero rutaParadero = new RutaParadero();
+        rutaParadero.setRuta(r);
+        rutaParadero.setParadero(paraderoGuardado);
+        rutaParadero.setOrden(siguienteOrden);
+        
+        return new ResponseEntity<>(rutaParaderoRepository.save(rutaParadero), HttpStatus.CREATED);
     }
 }
 

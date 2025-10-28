@@ -1,6 +1,5 @@
 package com.example.transitweb.dto;
 
-import com.example.transitweb.entity.Rol;
 import lombok.Data;
 
 /**

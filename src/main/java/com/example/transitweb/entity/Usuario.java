@@ -1,7 +1,6 @@
 package com.example.transitweb.entity;
 
 import jakarta.persistence.*;
-import com.example.transitweb.entity.Rol;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
